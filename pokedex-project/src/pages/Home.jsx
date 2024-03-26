@@ -36,7 +36,7 @@ function Home() {
         setIsLoading(false);
       }
     };
-
+    
     fetchPokemonData();
   }, []);
 
