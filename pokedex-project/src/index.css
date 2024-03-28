@@ -23,3 +23,49 @@ code {
   margin-top:10px;
   margin-left:10px
 }
+
+.team-builder-container {
+  display: flex;
+  align-items: center;
+}
+
+h1 {
+  cursor: pointer;
+  transition: color 0.3s ease, font-weight 0.3s ease;
+  margin: 0 10px;
+}
+
+.active {
+  color: green; /* Adjust the color for the active state */
+  font-weight: bold;
+}
+
+.inactive {
+  color: #999; /* Adjust the color for the inactive state */
+  font-weight: normal;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 60px;
+  height: 30px;
+  display: inline-block;
+  background-color: #ddd;
+  border-radius: 15px;
+}
+
+.toggle-switch-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  background-color: #fff;
+  border-radius: 15px;
+  transition: all 0.3s;
+}
+
+.toggle-switch.checked .toggle-switch-inner {
+  left: 30px;
+}
+

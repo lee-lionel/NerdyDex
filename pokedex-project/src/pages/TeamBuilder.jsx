@@ -10,11 +10,16 @@ function TeamBuilder() {
   };
 
   return (
-    <div>
-      <label htmlFor="toggle">Toggle:</label>
-      <input type="checkbox" id="toggle" checked={showCreateForm} onChange={toggleForm} />
+    <>
+    <div className="team-builder-container">
+      <h1 className={showCreateForm ? 'inactive' : 'active'} onClick={() => setShowCreateForm(false)}>View Teams</h1>
+      <div className={`toggle-switch ${showCreateForm ? 'checked' : ''}`} onClick={toggleForm}>
+        <div className="toggle-switch-inner" />
+      </div>
+      <h1 className={showCreateForm ? 'active' : 'inactive'} onClick={() => setShowCreateForm(true)}>Create Team</h1>
+      </div>
       {showCreateForm ? <CreateTeamForm /> : <ViewTeams />}
-    </div>
+      </>
   );
 }
 
