@@ -1,25 +1,37 @@
 import React, { useState } from 'react';
 import ViewTeams from '../components/ViewTeams'; // Import the ViewTeams component
 import CreateTeamForm from '../components/CreateTeamForm'; // Import the CreateTeamForm component
+import './TeamBuilder.css';
 
 function TeamBuilder() {
   const [showCreateForm, setShowCreateForm] = useState(false);
 
-  const toggleForm = () => {
-    setShowCreateForm(!showCreateForm);
-  };
-
   return (
-    <>
-    <div className="team-builder-container">
-      <h1 className={showCreateForm ? 'inactive' : 'active'} onClick={() => setShowCreateForm(false)}>View Teams</h1>
-      <div className={`toggle-switch ${showCreateForm ? 'checked' : ''}`} onClick={toggleForm}>
-        <div className="toggle-switch-inner" />
-      </div>
-      <h1 className={showCreateForm ? 'active' : 'inactive'} onClick={() => setShowCreateForm(true)}>Create Team</h1>
+    <div className="page">
+      <div className="team-builder-container">
+        <div className="segmented" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={!showCreateForm}
+            className={showCreateForm ? 'segment' : 'segment segment-active'}
+            onClick={() => setShowCreateForm(false)}
+          >
+            View Teams
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={showCreateForm}
+            className={showCreateForm ? 'segment segment-active' : 'segment'}
+            onClick={() => setShowCreateForm(true)}
+          >
+            Create Team
+          </button>
+        </div>
       </div>
       {showCreateForm ? <CreateTeamForm /> : <ViewTeams />}
-      </>
+    </div>
   );
 }
 

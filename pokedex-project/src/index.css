@@ -1,71 +1,258 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+/* ============================================================
+   NerdyDex — global design system
+   Tokens, reset, base elements and shared primitives.
+   Component-specific styling lives beside each component.
+   ============================================================ */
+
+:root {
+  /* Brand — Pokédex red */
+  --brand-50: #fdecee;
+  --brand-100: #fbd5d9;
+  --brand-500: #e3364e;
+  --brand-600: #cc2340;
+  --brand-700: #a51a32;
+
+  /* Neutrals */
+  --bg: #f4f5f9;
+  --surface: #ffffff;
+  --surface-alt: #eef0f6;
+  --border: #e0e3ed;
+  --border-strong: #c7ccdb;
+  --text: #16192b;
+  --text-muted: #5c6480;
+  --text-subtle: #8b92ab;
+
+  --accent-500: #f2b134;
+  --success-600: #1f9254;
+  --danger-50: #fdeceb;
+  --danger-600: #d3453a;
+
+  /* Type */
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
+  --font-mono: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: clamp(1.75rem, 4vw, 2.5rem);
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  /* Shape */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(22, 25, 43, 0.06);
+  --shadow-md: 0 4px 14px rgba(22, 25, 43, 0.09);
+  --shadow-lg: 0 18px 44px rgba(22, 25, 43, 0.16);
+
+  --navbar-h: 60px;
+  --content-max: 900px;
+}
+
+/* ------------------------------------------------------------
+   Reset
+   ------------------------------------------------------------ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.55;
+  color: var(--text);
+  background-color: var(--bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol {
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+h1 { font-size: var(--text-2xl); }
+h2 { font-size: var(--text-xl); }
+h3 { font-size: var(--text-lg); }
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: var(--font-mono);
 }
 
-.Home {
-  display: flex;
+:focus-visible {
+  outline: 3px solid var(--brand-100);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------
+   Page shell — offsets the fixed navbar
+   ------------------------------------------------------------ */
+
+.page {
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: calc(var(--navbar-h) + var(--space-6)) var(--space-4) var(--space-7);
+}
+
+/* ------------------------------------------------------------
+   Cards
+   ------------------------------------------------------------ */
+
+.card {
+  padding: var(--space-5);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ------------------------------------------------------------
+   Buttons
+   ------------------------------------------------------------ */
+
+button {
+  font-family: inherit;
+}
+
+.btn,
+button[type="submit"] {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.Pokedex {
-  margin-top:10px;
-  margin-left:10px
-}
-
-.team-builder-container {
-  display: flex;
-  align-items: center;
-}
-
-h1 {
+  gap: var(--space-2);
+  padding: 0.7rem 1.25rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1;
+  color: #fff;
+  background-color: var(--brand-600);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: color 0.3s ease, font-weight 0.3s ease;
-  margin: 0 10px;
+  transition: background-color 0.15s ease, transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
-.active {
-  color: green; /* Adjust the color for the active state */
-  font-weight: bold;
+.btn:hover,
+button[type="submit"]:hover {
+  background-color: var(--brand-700);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
-.inactive {
-  color: #999; /* Adjust the color for the inactive state */
-  font-weight: normal;
+.btn:active,
+button[type="submit"]:active {
+  transform: translateY(0);
+  box-shadow: none;
 }
 
-.toggle-switch {
-  position: relative;
-  width: 60px;
-  height: 30px;
-  display: inline-block;
-  background-color: #ddd;
-  border-radius: 15px;
+.btn-danger {
+  color: var(--danger-600);
+  background-color: var(--surface);
+  border-color: var(--border-strong);
 }
 
-.toggle-switch-inner {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 30px;
-  height: 30px;
-  background-color: #fff;
-  border-radius: 15px;
-  transition: all 0.3s;
+.btn-danger:hover {
+  color: var(--danger-600);
+  background-color: var(--danger-50);
+  border-color: var(--danger-600);
 }
 
-.toggle-switch.checked .toggle-switch-inner {
-  left: 30px;
+/* ------------------------------------------------------------
+   Form controls
+   ------------------------------------------------------------ */
+
+input[type="text"],
+input[type="number"],
+select {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  font-family: inherit;
+  font-size: var(--text-base);
+  color: var(--text);
+  background-color: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--brand-500);
+  box-shadow: 0 0 0 3px var(--brand-100);
+}
+
+input::placeholder {
+  color: var(--text-subtle);
+}
+
+label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ------------------------------------------------------------
+   Misc
+   ------------------------------------------------------------ */
+
+.muted {
+  color: var(--text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

@@ -1,0 +1,50 @@
+/* Team builder — segmented control switching between the team list
+   and the create form. */
+
+.team-builder-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-6);
+}
+
+.segmented {
+  display: inline-flex;
+  padding: 4px;
+  background-color: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+}
+
+.segment {
+  padding: 0.55rem 1.4rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.segment:hover {
+  color: var(--text);
+}
+
+.segment-active {
+  color: var(--brand-700);
+  background-color: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 480px) {
+  .segmented {
+    width: 100%;
+  }
+
+  .segment {
+    flex: 1;
+    padding: 0.55rem 0.75rem;
+  }
+}

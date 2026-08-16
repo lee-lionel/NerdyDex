@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import "./Home.css";
 
 function Home() {
   const [pokemonData, setPokemonData] = useState({
@@ -36,19 +37,22 @@ function Home() {
         setIsLoading(false);
       }
     };
-    
+
     fetchPokemonData();
   }, []);
 
   return (
-    <div className="Home">
+    <div className="page Home">
       {isLoading ? (
-        <p>Loading...</p>
+        <p className="home-loading">Loading...</p>
       ) : (
-        <div>
-          <h1>{pokemonData.name}</h1>
-          <img src={pokemonData.image} alt={pokemonData.name} />
-          <p>{pokemonData.description}</p>
+        <div className="home-card">
+          <p className="home-eyebrow">Pokémon of the moment</p>
+          <div className="home-sprite">
+            <img src={pokemonData.image} alt={pokemonData.name} />
+          </div>
+          <h1 className="home-name">{pokemonData.name}</h1>
+          <p className="home-description">{pokemonData.description}</p>
         </div>
       )}
     </div>

@@ -1,0 +1,101 @@
+/* Navbar — fixed top bar.
+   Replaces the inline styles that previously pinned this to the top-right. */
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--navbar-h);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.navbar-inner {
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-base);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Poké Ball mark */
+.navbar-brand-mark {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--text);
+  border-radius: var(--radius-full);
+  background:
+    linear-gradient(var(--brand-600) 0 50%, var(--surface) 50% 100%);
+  position: relative;
+}
+
+.navbar-brand-mark::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  transform: translate(-50%, -50%);
+  background-color: var(--surface);
+  border: 2px solid var(--text);
+  border-radius: var(--radius-full);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.nav-link {
+  padding: 0.45rem 0.8rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.nav-link:hover {
+  color: var(--brand-600);
+  background-color: var(--brand-50);
+}
+
+.nav-link-active {
+  color: var(--brand-700);
+  background-color: var(--brand-50);
+}
+
+@media (max-width: 520px) {
+  .navbar-inner {
+    padding: 0 var(--space-3);
+    gap: var(--space-2);
+  }
+
+  .nav-link {
+    padding: 0.4rem 0.55rem;
+    font-size: var(--text-xs);
+  }
+}

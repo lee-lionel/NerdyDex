@@ -1,13 +1,23 @@
-import {Link} from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
+import './Navbar.css'
 
 function Navbar() {
+    const linkClass = ({ isActive }) =>
+        isActive ? 'nav-link nav-link-active' : 'nav-link'
+
     return (
-        <nav style={{display:'inline-flex', position:'fixed', top:'0', right:'0'}}>
-<div style={{margin:'20px'}}><Link to='/'>Home</Link></div>
-<div style={{margin:'20px'}}><Link to='/pokedex'>Pokedex</Link></div>
-<div style={{margin:'20px'}}><Link to='/teamBuilder'>TeamBuilder</Link></div>
-
-
+        <nav className='navbar'>
+            <div className='navbar-inner'>
+                <NavLink to='/' className='navbar-brand'>
+                    <span className='navbar-brand-mark' aria-hidden='true' />
+                    NerdyDex
+                </NavLink>
+                <div className='nav-links'>
+                    <NavLink to='/' className={linkClass} end>Home</NavLink>
+                    <NavLink to='/pokedex' className={linkClass}>Pokedex</NavLink>
+                    <NavLink to='/teamBuilder' className={linkClass}>TeamBuilder</NavLink>
+                </div>
+            </div>
         </nav>
     )
 }

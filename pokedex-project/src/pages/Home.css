@@ -1,0 +1,62 @@
+/* Home — a single random Pokémon showcase card. */
+
+.Home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - var(--navbar-h));
+}
+
+.home-loading {
+  color: var(--text-muted);
+}
+
+.home-card {
+  width: 100%;
+  max-width: 420px;
+  padding: var(--space-6);
+  text-align: center;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.home-eyebrow {
+  margin-bottom: var(--space-4);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+/* Sprites are small, low-res PNGs — scale them up without smoothing. */
+.home-sprite {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto var(--space-4);
+  background: radial-gradient(circle at 50% 55%, var(--surface-alt), transparent 70%);
+  border-radius: var(--radius-full);
+}
+
+.home-sprite img {
+  width: 140px;
+  height: 140px;
+  image-rendering: pixelated;
+}
+
+.home-name {
+  margin-bottom: var(--space-3);
+  font-size: var(--text-2xl);
+  text-transform: capitalize;
+}
+
+.home-description {
+  font-size: var(--text-sm);
+  line-height: 1.65;
+  color: var(--text-muted);
+}

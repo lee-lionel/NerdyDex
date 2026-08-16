@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import Airtable from 'airtable';
+import PokemonSprite from './PokemonSprite';
+import './CreateTeamForm.css';
 
 function CreateTeamForm() {
   const [teamName, setTeamName] = useState('');
@@ -58,33 +60,43 @@ function CreateTeamForm() {
   };
 
   return (
-    <div>
-      <h1>Create Team</h1>
+    <div className="team-form-card">
+      <h1 className="team-form-title">Create Team</h1>
       <form onSubmit={handleSubmit}>
-        <label htmlFor="teamName">Team Name:</label>
-        <input type="text" id="teamName" value={teamName} onChange={(e) => setTeamName(e.target.value)} required />
-        <br />
-        <label htmlFor="format">Format:</label>
-        <select id="format" value={format} onChange={(e) => setFormat(e.target.value)} required>
-        <option value="">Select a format</option>
-        <option value="VGC 2024">VGC 2024</option>
-        <option value="Smogon OU 2024">Smogon OU 2024</option>
-        <option value="3v3 Singles 2024">3v3 Singles 2024</option>
-        </select>
-        <h2>Pokémon:</h2>
-        {[1, 2, 3, 4, 5, 6].map((index) => (
-          <div key={`pokemon-${index}`}>
-            <label htmlFor={`pokemon-${index}`}>Pokemon {index}:</label>
-            <input type="text" id={`pokemon-${index}`} value={pokemonList[index - 1] || ''} onChange={(e) => handlePokemonChange(index - 1, e.target.value)} />
+        <div className="field-row">
+          <div className="field">
+            <label htmlFor="teamName">Team Name</label>
+            <input type="text" id="teamName" value={teamName} onChange={(e) => setTeamName(e.target.value)} required />
           </div>
-        ))}
-        <h2>Held Items:</h2>
-        {[1, 2, 3, 4, 5, 6].map((index) => (
-          <div key={`heldItem-${index}`}>
-            <label htmlFor={`heldItem-${index}`}>Held Item {index}:</label>
-            <input type="text" id={`heldItem-${index}`} value={heldItemList[index - 1] || ''} onChange={(e) => handleHeldItemChange(index - 1, e.target.value)} />
+          <div className="field">
+            <label htmlFor="format">Format</label>
+            <select id="format" value={format} onChange={(e) => setFormat(e.target.value)} required>
+              <option value="">Select a format</option>
+              <option value="VGC 2024">VGC 2024</option>
+              <option value="Smogon OU 2024">Smogon OU 2024</option>
+              <option value="3v3 Singles 2024">3v3 Singles 2024</option>
+            </select>
           </div>
-        ))}
+        </div>
+
+        <h2 className="team-form-subtitle">Roster</h2>
+        <div className="roster">
+          {[1, 2, 3, 4, 5, 6].map((index) => (
+            <div key={`slot-${index}`} className="roster-slot">
+              <span className="roster-slot-number">{index}</span>
+              <PokemonSprite name={pokemonList[index - 1]} size={44} delay={450} />
+              <div className="field">
+                <label htmlFor={`pokemon-${index}`}>Pokemon {index}</label>
+                <input type="text" id={`pokemon-${index}`} value={pokemonList[index - 1] || ''} onChange={(e) => handlePokemonChange(index - 1, e.target.value)} />
+              </div>
+              <div className="field">
+                <label htmlFor={`heldItem-${index}`}>Held Item {index}</label>
+                <input type="text" id={`heldItem-${index}`} value={heldItemList[index - 1] || ''} onChange={(e) => handleHeldItemChange(index - 1, e.target.value)} />
+              </div>
+            </div>
+          ))}
+        </div>
+
         <button type="submit">Create Team</button>
       </form>
     </div>
