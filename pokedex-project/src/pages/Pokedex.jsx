@@ -14,27 +14,48 @@ function Pokedex() {
   });
 
   const [pokemonInput, setPokemonInput] = useState("");
+  const [status, setStatus] = useState("idle"); // idle | loading | notFound | error
+  const [lastSearch, setLastSearch] = useState("");
 
   const getPokemonData = async (pokemon) => {
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon}`);
-    const jsonData = await response.json();
+    setStatus("loading");
+    setLastSearch(pokemon);
+    try {
+      const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon}`);
 
-    setPokemonData({
-      name: jsonData.name,
-      image: jsonData.sprites.front_default,
-      types: jsonData.types.map((typeObj) => typeObj.type.name),
-      abilities: jsonData.abilities.map((abilityObj) => abilityObj.ability.name),
-      baseStats: jsonData.stats.map((statObj) => ({
-        name: statObj.stat.name,
-        value: statObj.base_stat,
-      })),
-      moves: jsonData.moves.map((moveObj) => moveObj.move.name),
-    });
+      // Without this check a 404 still parses as JSON and the first
+      // property access throws.
+      if (response.status === 404) {
+        setStatus("notFound");
+        return;
+      }
+      if (!response.ok) throw new Error(`PokeAPI responded ${response.status}`);
+
+      const jsonData = await response.json();
+
+      setPokemonData({
+        name: jsonData.name,
+        image: jsonData.sprites.front_default,
+        types: jsonData.types.map((typeObj) => typeObj.type.name),
+        abilities: jsonData.abilities.map((abilityObj) => abilityObj.ability.name),
+        baseStats: jsonData.stats.map((statObj) => ({
+          name: statObj.stat.name,
+          value: statObj.base_stat,
+        })),
+        moves: jsonData.moves.map((moveObj) => moveObj.move.name),
+      });
+      setStatus("ready");
+    } catch (error) {
+      console.error(error);
+      setStatus("error");
+    }
   };
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
-    getPokemonData(pokemonInput);
+    const query = pokemonInput.trim();
+    if (!query) return;
+    getPokemonData(query);
   };
 
   useEffect(() => {
@@ -55,10 +76,24 @@ function Pokedex() {
             setPokemonInput(event.target.value.toLowerCase());
           }}
         />
-        <button type="submit">Search</button>
+        <button type="submit" disabled={status === "loading"}>
+          {status === "loading" ? "Searching…" : "Search"}
+        </button>
       </form>
 
-      {pokemonData.name && (
+      {status === "notFound" && (
+        <p className="pokedex-message">
+          No Pokémon called “{lastSearch}”. Check the spelling and try again.
+        </p>
+      )}
+
+      {status === "error" && (
+        <p className="pokedex-message pokedex-message-error">
+          Couldn't reach the Pokédex. Check your connection and try again.
+        </p>
+      )}
+
+      {status === "ready" && pokemonData.name && (
         <div className="pokemon">
           <header className="pokemon-header">
             <div className="pokemon-sprite">

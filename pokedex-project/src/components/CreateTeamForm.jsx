@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Airtable from 'airtable';
 import PokemonSprite from './PokemonSprite';
+import { teamTable } from '../utilities/airtable';
 import './CreateTeamForm.css';
 
 function CreateTeamForm() {
@@ -21,13 +21,14 @@ function CreateTeamForm() {
     setHeldItemList(updatedHeldItemList);
   };
 
+  const [saving, setSaving] = useState(false);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    const base = new Airtable({ apiKey: process.env.REACT_APP_AIRTABLE_API_KEY }).base('app2Zq6DikKlO4AV3');
+    setSaving(true);
 
     try {
-      const createdTeam = await base('Team List').create([
+      const createdTeam = await teamTable().create([
         {
           "fields": {
             "Team Name": teamName,
@@ -56,6 +57,9 @@ function CreateTeamForm() {
       setHeldItemList([]);
     } catch (error) {
       console.error('Error creating team:', error);
+      alert(`Could not save the team: ${error.message}`);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -97,7 +101,9 @@ function CreateTeamForm() {
           ))}
         </div>
 
-        <button type="submit">Create Team</button>
+        <button type="submit" disabled={saving}>
+          {saving ? 'Saving…' : 'Create Team'}
+        </button>
       </form>
     </div>
   );

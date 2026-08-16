@@ -1,48 +1,68 @@
-import React, { useState, useEffect } from 'react';
-import Airtable from 'airtable';
+import React, { useState, useEffect, useCallback } from 'react';
 import PokemonSprite from './PokemonSprite';
+import { teamTable, isConfigured } from '../utilities/airtable';
 import './ViewTeams.css';
-
 
 function ViewTeams() {
   const [teams, setTeams] = useState([]);
-  const apiKey = process.env.REACT_APP_AIRTABLE_API_KEY;
-  const base = new Airtable({ apiKey }).base('app2Zq6DikKlO4AV3');
+  // 'loading' | 'ready' | 'error' — an empty list and a failed request are
+  // not the same thing, and must not render the same message.
+  const [status, setStatus] = useState('loading');
+  const [error, setError] = useState(null);
 
-
-  const fetchTeams = async () => {
-    try {
-      const records = await base('Team List').select({
-        // maxRecords: 3,
-        view: 'Grid view',
-      }).all();
-
-      setTeams(records);
-    } catch (error) {
-      console.error('Error fetching teams:', error);
+  const fetchTeams = useCallback(async () => {
+    if (!isConfigured) {
+      setStatus('error');
+      setError(new Error('Airtable is not configured — set REACT_APP_AIRTABLE_API_KEY.'));
+      return;
     }
-  };
+    try {
+      setStatus('loading');
+      const records = await teamTable().select({ view: 'Grid view' }).all();
+      setTeams(records);
+      setStatus('ready');
+    } catch (err) {
+      console.error('Error fetching teams:', err);
+      setError(err);
+      setStatus('error');
+    }
+  }, []);
 
   const handleDelete = async (teamId) => {
+    const previous = teams;
+    // Optimistic removal, rolled back if the request fails.
+    setTeams((prevTeams) => prevTeams.filter((team) => team.id !== teamId));
     try {
-      await base('Team List').destroy(teamId);
-      // Update the teams state after deletion
-      setTeams((prevTeams) => prevTeams.filter((team) => team.id !== teamId));
-    } catch (error) {
-      console.error('Error deleting team:', error);
+      await teamTable().destroy(teamId);
+    } catch (err) {
+      console.error('Error deleting team:', err);
+      setTeams(previous);
+      alert(`Could not delete that team: ${err.message}`);
     }
   };
 
   useEffect(() => {
     fetchTeams();
-  }, []);
+  }, [fetchTeams]);
 
+  if (status === 'loading') {
+    return <p className="teams-message">Loading teams…</p>;
+  }
 
+  if (status === 'error') {
+    return (
+      <div className="teams-message teams-error">
+        <p>Couldn't load your teams.</p>
+        <p className="teams-error-detail">{error && error.message}</p>
+        <button className="btn" onClick={fetchTeams}>Try again</button>
+      </div>
+    );
+  }
 
   return (
     <div className="teams">
       {teams.length === 0 && (
-        <p className="teams-empty">No teams yet — create one to get started.</p>
+        <p className="teams-message">No teams yet — create one to get started.</p>
       )}
 
       {teams.map((team) => (

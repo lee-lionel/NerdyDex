@@ -16,6 +16,24 @@
   flex-shrink: 0;
 }
 
+/* Search feedback — a misspelled name is a normal outcome, not an error,
+   so it stays neutral; a failed request does not. */
+.pokedex-message {
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+  color: var(--text-muted);
+  background-color: var(--surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+}
+
+.pokedex-message-error {
+  color: var(--danger-600);
+  background-color: var(--danger-50);
+  border-style: solid;
+  border-color: var(--danger-600);
+}
+
 /* Detail card */
 
 .pokemon {
