@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import "./Pokedex.css";
+
+const MAX_STAT = 255; // highest possible base stat, used to scale the bars
 
 function Pokedex() {
   const [pokemonData, setPokemonData] = useState({
@@ -35,17 +37,15 @@ function Pokedex() {
     getPokemonData(pokemonInput);
   };
 
- 
-
-    useEffect(() => {
+  useEffect(() => {
     if (pokemonData.name) {
       setPokemonInput("");
     }
   }, [pokemonData.name]);
 
   return (
-    <div className="Pokedex">
-      <form onSubmit={handleFormSubmit}>
+    <div className="page Pokedex">
+      <form className="pokedex-search" onSubmit={handleFormSubmit}>
         <input
           type="text"
           name="pokemonName"
@@ -60,45 +60,69 @@ function Pokedex() {
 
       {pokemonData.name && (
         <div className="pokemon">
-          <img src={pokemonData.image} alt={pokemonData.name} />
-          <h2>{pokemonData.name}</h2>
+          <header className="pokemon-header">
+            <div className="pokemon-sprite">
+              <img src={pokemonData.image} alt={pokemonData.name} />
+            </div>
+            <div className="pokemon-identity">
+              <h2 className="pokemon-name">{pokemonData.name}</h2>
+              {pokemonData.types.length > 0 && (
+                <div className="type-badges">
+                  {pokemonData.types.map((type) => (
+                    <span key={type} className={`type-badge type-${type}`}>
+                      {type}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </header>
 
-          {pokemonData.types && pokemonData.types.length > 0 && (
-            <p>Types: {pokemonData.types.join(", ")}</p>
+          {pokemonData.abilities.length > 0 && (
+            <section className="pokemon-section">
+              <h3 className="section-title">Abilities</h3>
+              <div className="chip-list">
+                {pokemonData.abilities.map((ability) => (
+                  <span key={ability} className="chip">{ability}</span>
+                ))}
+              </div>
+            </section>
           )}
 
-          {pokemonData.abilities && pokemonData.abilities.length > 0 && (
-            <p>Abilities: {pokemonData.abilities.join(", ")}</p>
-          )}
-
-          {pokemonData.baseStats && pokemonData.baseStats.length > 0 && (
-            <p>
-              Base Stats:
-              <ul>
+          {pokemonData.baseStats.length > 0 && (
+            <section className="pokemon-section">
+              <h3 className="section-title">Base Stats</h3>
+              <ul className="stat-list">
                 {pokemonData.baseStats.map((stat) => (
-                  <li key={stat.name}>
-                    {stat.name}: {stat.value}
+                  <li key={stat.name} className="stat-row">
+                    <span className="stat-name">{stat.name.replace(/-/g, " ")}</span>
+                    <span className="stat-track">
+                      <span
+                        className="stat-fill"
+                        style={{ width: `${(stat.value / MAX_STAT) * 100}%` }}
+                      />
+                    </span>
+                    <span className="stat-value">{stat.value}</span>
                   </li>
                 ))}
               </ul>
-            </p>
+            </section>
           )}
 
-          {pokemonData.moves && pokemonData.moves.length > 0 && (
-            <p>
-              Moves:
-              <ul>
+          {pokemonData.moves.length > 0 && (
+            <section className="pokemon-section">
+              <h3 className="section-title">
+                Moves <span className="section-count">{pokemonData.moves.length}</span>
+              </h3>
+              <div className="chip-list moves-list">
                 {pokemonData.moves.map((move) => (
-                  <li key={move}>{move}</li>
+                  <span key={move} className="chip">{move}</span>
                 ))}
-              </ul>
-            </p>
+              </div>
+            </section>
           )}
         </div>
       )}
-
- 
-
     </div>
   );
 }
