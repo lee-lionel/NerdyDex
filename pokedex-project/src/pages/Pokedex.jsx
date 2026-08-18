@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import "./Pokedex.css";
+import { useNameIndex } from "../utils/useNameIndex";
+import { pickBest, rank } from "../utils/fuzzy";
 
 const MAX_STAT = 255; // highest possible base stat, used to scale the bars
 
@@ -17,9 +19,29 @@ function Pokedex() {
   const [status, setStatus] = useState("idle"); // idle | loading | notFound | error
   const [lastSearch, setLastSearch] = useState("");
 
-  const getPokemonData = async (pokemon) => {
+  /* Fuzzy search state. `correctedFrom` records that the reader typed
+     something misspelled and we searched for the nearest name instead, so
+     the result can say so rather than silently showing a different Pokemon.
+     `suggestions` are the near-misses offered when nothing was confident. */
+  const names = useNameIndex();
+  const [correctedFrom, setCorrectedFrom] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [highlighted, setHighlighted] = useState(-1);
+  const boxRef = useRef(null);
+
+  // Live matches for what is typed, for the suggestion list under the input.
+  const matches = useMemo(
+    () => (names.length ? rank(pokemonInput, names, 6) : []),
+    [pokemonInput, names]
+  );
+
+  const getPokemonData = async (pokemon, typedInstead = "") => {
     setStatus("loading");
     setLastSearch(pokemon);
+    setCorrectedFrom(typedInstead);
+    setSuggestions([]);
+    setOpen(false);
     try {
       const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon}`);
 
@@ -51,11 +73,63 @@ function Pokedex() {
     }
   };
 
+  const runSearch = (raw) => {
+    const query = raw.trim().toLowerCase();
+    if (!query) return;
+
+    /* An exact name goes straight to the API. Otherwise the closest name is
+       searched instead when it is close enough to be obvious, and merely
+       plausible matches are offered rather than guessed at. */
+    if (!names.length || names.includes(query)) {
+      getPokemonData(query);
+      return;
+    }
+
+    const hits = rank(query, names, 6);
+    const { hit, confident } = pickBest(hits);
+    if (confident && hit) {
+      getPokemonData(hit.name, query);
+      return;
+    }
+
+    if (hits.length) {
+      setLastSearch(query);
+      setSuggestions(hits);
+      setStatus("notFound");
+      setOpen(false);
+      return;
+    }
+
+    // Nothing resembled it — let the API give the definitive answer.
+    getPokemonData(query);
+  };
+
   const handleFormSubmit = (event) => {
     event.preventDefault();
-    const query = pokemonInput.trim();
-    if (!query) return;
-    getPokemonData(query);
+    // Arrow keys move a highlight through the list; Enter takes that one.
+    if (open && highlighted >= 0 && matches[highlighted]) {
+      runSearch(matches[highlighted].name);
+      return;
+    }
+    runSearch(pokemonInput);
+  };
+
+  const handleKeyDown = (event) => {
+    if (!matches.length) return;
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      setOpen(true);
+      setHighlighted((current) => {
+        const step = event.key === "ArrowDown" ? 1 : -1;
+        const next = current + step;
+        if (next < 0) return matches.length - 1;
+        if (next >= matches.length) return 0;
+        return next;
+      });
+    } else if (event.key === "Escape") {
+      setOpen(false);
+      setHighlighted(-1);
+    }
   };
 
   useEffect(() => {
@@ -64,33 +138,114 @@ function Pokedex() {
     }
   }, [pokemonData.name]);
 
+  // Clicking away closes the suggestion list, the way a combobox should.
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (event) => {
+      if (boxRef.current && !boxRef.current.contains(event.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [open]);
+
   return (
     <div className="page Pokedex">
       <h1 className="sr-only">Pokédex</h1>
-      <form className="pokedex-search" onSubmit={handleFormSubmit}>
-        <input
-          type="text"
-          name="pokemonName"
-          placeholder="Enter a Pokemon Name"
-          value={pokemonInput}
-          onChange={(event) => {
-            setPokemonInput(event.target.value.toLowerCase());
-          }}
-        />
+      <form className="pokedex-search" onSubmit={handleFormSubmit} role="search">
+        <div className="pokedex-combobox" ref={boxRef}>
+          <input
+            type="text"
+            name="pokemonName"
+            placeholder="Enter a Pokemon Name"
+            value={pokemonInput}
+            autoComplete="off"
+            role="combobox"
+            aria-expanded={open && matches.length > 0}
+            aria-controls="pokedex-suggestions"
+            aria-autocomplete="list"
+            aria-activedescendant={
+              open && highlighted >= 0 ? `pokedex-option-${highlighted}` : undefined
+            }
+            aria-label="Search for a Pokémon by name"
+            onChange={(event) => {
+              setPokemonInput(event.target.value.toLowerCase());
+              setOpen(true);
+              setHighlighted(-1);
+            }}
+            onKeyDown={handleKeyDown}
+            onFocus={() => setOpen(true)}
+          />
+
+          {open && matches.length > 0 && (
+            <ul className="pokedex-suggestions" id="pokedex-suggestions" role="listbox">
+              {matches.map((hit, index) => (
+                <li
+                  key={hit.name}
+                  id={`pokedex-option-${index}`}
+                  role="option"
+                  aria-selected={index === highlighted}
+                  className={
+                    index === highlighted
+                      ? "pokedex-suggestion is-highlighted"
+                      : "pokedex-suggestion"
+                  }
+                  /* mousedown rather than click: the input's blur would
+                     close the list before a click ever landed. */
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    runSearch(hit.name);
+                  }}
+                  onMouseEnter={() => setHighlighted(index)}
+                >
+                  {hit.name}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
         <button type="submit" disabled={status === "loading"}>
           {status === "loading" ? "Searching…" : "Search"}
         </button>
       </form>
 
       {status === "notFound" && (
-        <p className="pokedex-message">
-          No Pokémon called “{lastSearch}”. Check the spelling and try again.
-        </p>
+        <div className="pokedex-message">
+          <p>No Pokémon called “{lastSearch}”.</p>
+          {suggestions.length > 0 && (
+            <p className="pokedex-didyoumean">
+              Did you mean{" "}
+              {suggestions.map((hit, index) => (
+                <React.Fragment key={hit.name}>
+                  {index > 0 && (index === suggestions.length - 1 ? " or " : ", ")}
+                  <button
+                    type="button"
+                    className="pokedex-suggestion-link"
+                    onClick={() => runSearch(hit.name)}
+                  >
+                    {hit.name}
+                  </button>
+                </React.Fragment>
+              ))}
+              ?
+            </p>
+          )}
+        </div>
       )}
 
       {status === "error" && (
         <p className="pokedex-message pokedex-message-error">
           Couldn't reach the Pokédex. Check your connection and try again.
+        </p>
+      )}
+
+      {/* Say plainly that a different name was searched. Silently showing
+          Charizard to someone who typed "charizrd" is helpful; not telling
+          them is how they end up thinking that is the spelling. */}
+      {status === "ready" && correctedFrom && (
+        <p className="pokedex-corrected" role="status">
+          Showing <strong>{pokemonData.name}</strong> — nothing matched “
+          {correctedFrom}”.
         </p>
       )}
 
