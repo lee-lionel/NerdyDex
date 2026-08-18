@@ -66,6 +66,7 @@ function Pokedex() {
 
   return (
     <div className="page Pokedex">
+      <h1 className="sr-only">Pokédex</h1>
       <form className="pokedex-search" onSubmit={handleFormSubmit}>
         <input
           type="text"

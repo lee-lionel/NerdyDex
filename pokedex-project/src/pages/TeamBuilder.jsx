@@ -8,6 +8,7 @@ function TeamBuilder() {
 
   return (
     <div className="page">
+      <h1 className="sr-only">Team builder</h1>
       <div className="team-builder-container">
         <div className="segmented" role="tablist">
           <button

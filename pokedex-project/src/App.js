@@ -9,11 +9,14 @@ function App() {
     <div className="App">
       <Router>
       <Navbar />
+        {/* A main landmark, so assistive tech can skip the nav. */}
+        <main>
         <Routes>
           <Route path='/' element={<Home />}></Route>
           <Route path='/pokedex' element={<Pokedex />} />
           <Route path='/teamBuilder' element={<TeamBuilder />} />
         </Routes>
+        </main>
       </Router>
     </div>
   );
