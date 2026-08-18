@@ -99,3 +99,18 @@
     font-size: var(--text-xs);
   }
 }
+
+/* The nav links and brand sit at 25-31px, under the 44px a finger needs.
+   Desktop keeps the tighter sizing. */
+@media (pointer: coarse) {
+  .navbar-brand,
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .nav-link {
+    padding-inline: 14px;
+  }
+}
